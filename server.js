@@ -13,18 +13,30 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-app.use('/api/doctors', require('./routes/doctor.routes'));
-app.use('/api/appointments', require('./routes/appointment.routes'));
+const doctorRoutes = require('./routes/doctor.routes');
+const appointmentRoutes = require('./routes/appointment.routes');
 
-// Database connection
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => {
-    console.log('MongoDB connected');
-    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-  })
-  .catch(err => console.error('MongoDB connection error:', err));
+app.use('/api/doctors', doctorRoutes);
+app.use('/api/appointments', appointmentRoutes);
 
-// Test endpoint
+// Health check / Test route
+app.get('/', (req, res) => {
+  res.send('✅ NirogGyan Backend is Live');
+});
+
 app.get('/api/test', (req, res) => {
   res.json({ status: 'Backend working', timestamp: new Date() });
+});
+
+// MongoDB Connection
+mongoose.connect(process.env.MONGODB_URI)
+
+.then(() => {
+  console.log('✅ Connected to MongoDB Atlas');
+  app.listen(PORT, () => {
+    console.log(`🚀 Server is running on port ${PORT}`);
+  });
+})
+.catch((err) => {
+  console.error('❌ MongoDB connection error:', err);
 });
